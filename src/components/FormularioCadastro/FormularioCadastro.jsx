@@ -5,6 +5,27 @@ class FormularioCadastro extends Component {
     super(props);
     this.titulo = "";
     this.texto = "";
+    this.categorias = "Sem Categoria";
+    this.state = {categorias:[]}
+    this._novasCategorias = this._novasCategorias.bind(this)
+  }
+
+  componentDidMount()
+{
+  this.props.categorias.inscrever(this._novasCategorias);
+}
+
+componentWillUnmount(){
+  this.props.categorias.desinscrever(this._novasCategorias);
+}
+
+  _novasCategorias(categorias){
+  this.setState({...this.state,categorias})
+  }
+
+  _handleMudancaCategoria(evento){
+    evento.stopPropagation();
+    this.categorias = evento.target.value;
   }
 
   _handleMudaTitulo(evento){
@@ -21,7 +42,7 @@ class FormularioCadastro extends Component {
     evento.preventDefault();
     evento.stopPropagation();
     console.log(`Uma nova nota foi criada com sucesso! `+ this.titulo + " " + this.texto)
-    this.props.criarNota(this.titulo, this.texto);
+    this.props.criarNota(this.titulo, this.texto, this.categorias);
   }
 
   render() {
@@ -29,21 +50,27 @@ class FormularioCadastro extends Component {
       <form className="form-cadastro"
         onSubmit={this._criarNota.bind(this)}
       >
-        <input
+      <select onChange={this._handleMudancaCategoria.bind(this)} className='form-cadastro_input'>
+        <option>Sem Categoria</option>
+        {this.state.categorias.map((categorias, index) =>{
+          return <option key = {index} >{categorias}</option>;
+        })}
+      </select>
+      <input
           type="text"
           placeholder="Título"
           className="form-cadastro_input"
           onChange={this._handleMudaTitulo.bind(this)}
-        />
-        <textarea
+      />
+      <textarea
           rows={15}
           placeholder="Escreva sua nota..."
           className="form-cadastro_input"
           onChange={this._handleMudancaTexto.bind(this)}
-        />
-        <button className="form-cadastro_input form-cadastro_submit">
+      />
+      <button className="form-cadastro_input form-cadastro_submit">
           Criar Nota
-        </button>
+      </button>
       </form>
     );
   }
